@@ -8,6 +8,7 @@ d=0.85
 
 class AdjacentGraph:
     def __init__(self, f):
+        print >> sys.stderr, "Building adjacent graph...",
         content = f.readlines()
         self.outlink = {}
         self.maxnode = int(content[0].split()[1])
@@ -17,6 +18,8 @@ class AdjacentGraph:
             (in_node, out_nodes) = line.strip().split(':')
             # First number after : denotes the amount of outoutlinks
             self.outlink[int(in_node)] = tuple([int(x) for x in out_nodes.split()[1:]])
+
+        print >> sys.stderr, "done."
         return
 
 class PageRank:
@@ -35,7 +38,9 @@ class PageRank:
     @staticmethod
     # Euclidean distance between their prestige
     def distance(a, b):
-        return reduce(lambda x, y: x + y**2, a.prestige - b.prestige, 0) ** 0.5
+        d = reduce(lambda x, y: x + y**2, a.prestige - b.prestige, 0) ** 0.5
+        print >> sys.stderr, "distance =", d
+        return d
 
     # Transition
     def __rmul__(self, A):
@@ -43,6 +48,8 @@ class PageRank:
         # Initiate with the 1-d for random surfing
         new_prestige = numpy.array([1-d] * (self.maxnode + 1))
         for i in range(1, len(new_prestige)):
+            if i % 10000 == 0:
+                print >> sys.stderr, str(i)+",",
             if i not in A.outlink:    # Share prestige to every one
                 new_prestige += d * self.prestige[i] / self.maxnode
             else:
@@ -57,10 +64,14 @@ class PageRank:
 
 # Compute pagerank from adjacency
 def compute_pagerank(A):
+    print >> sys.stderr, "Computing PageRank...."
+    i = 0
+    print >> sys.stderr, "Iteration %d:" % (i),
     # Transit until converge
     curr_rank = PageRank(A.maxnode)
     next_rank = A * curr_rank
     while PageRank.distance(curr_rank, next_rank) > EPS:
+        i += 1
         curr_rank = next_rank
         next_rank = A * curr_rank
     curr_rank = next_rank
