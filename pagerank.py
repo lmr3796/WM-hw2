@@ -85,11 +85,8 @@ def compute_pagerank(A):
 
 
 def main():
-    if len(sys.argv) > 1:
-        with open(sys.argv[1]) as f:
-            A = AdjacentGraph(f)
-    else:
-        A = AdjacentGraph(sys.stdin)
+    with open(sys.argv[-1] if len(sys.argv > 1) else sys.stdin) as f:
+        A = AdjacentGraph(f)
 
     pagerank = compute_pagerank(A)
     print pagerank
