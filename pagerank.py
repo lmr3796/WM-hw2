@@ -30,6 +30,10 @@ class PageRank:
         self.prestige = numpy.array(self.prestige)
         return
 
+    def __str__(self):
+        return ''.join(['%d:%f\n' % (i, rank) for i, rank in enumerate(self.prestige) if i != 0])
+
+
     @staticmethod
     # Euclidean distance between their prestige
     def distance(a, b):
