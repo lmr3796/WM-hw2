@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import sys
+import copy
 import numpy
 
 EPS=1e-6
@@ -9,6 +10,10 @@ d=0.85
 log_file = sys.stderr
 
 class AdjacentGraph:
+    def __init__(self, maxnode, outlink):
+        self.outlink = copy.deepcopy(outlink)
+        self.maxnode = maxnode
+
     def __init__(self, f):
         print >> sys.stderr, "Building adjacent graph...",
         content = f.readlines()
@@ -85,8 +90,11 @@ def compute_pagerank(A):
 
 
 def main():
-    with open(sys.argv[-1] if len(sys.argv > 1) else sys.stdin) as f:
-        A = AdjacentGraph(f)
+    if len(sys.argv) > 1 :
+        with open(sys.argv[-1]) as f:
+            A = AdjacentGraph(f)
+    else:
+        A = AdjacentGraph(sys.stdin)
 
     pagerank = compute_pagerank(A)
     print pagerank
