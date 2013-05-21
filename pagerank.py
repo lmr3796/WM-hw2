@@ -60,9 +60,14 @@ class PageRank:
 def main():
     with open(sys.argv[1]) as f:
         A = AdjacentGraph(f)
-    curr_rank = Pagerank(A.maxnode)
-    next_rank = curr_rank(A)
 
+    # Transit until converge
+    curr_rank = Pagerank(A.maxnode)
+    next_rank = curr_rank(A * curr_rank)
+    while Pagerank.distance(curr_rank, next_rank) > EPS:
+        curr_rank = next_rank
+        next_rank = curr_rank(A * curr_rank)
+    curr_rank = next_rank
 
     return 0
 
