@@ -13,22 +13,22 @@ class AdjacentGraph:
     def __init__(self, maxnode, outlink):
         self.outlink = copy.deepcopy(outlink)
         self.maxnode = maxnode
+        self.no_outlink = tuple([i for i in range(1, self.maxnode + 1) if i not in self.outlink])
 
-    def __init__(self, f):
+    @classmethod
+    def fromfile(cls, f):
         print >> sys.stderr, "Building adjacent graph...",
         content = f.readlines()
-        self.outlink = {}
-        self.maxnode = int(content[0].split()[1])
+        outlink = {}
+        maxnode = int(content[0].split()[1])
         for line in content[1:]:
             if len(line.strip().split(':')) < 2:    # Avoid trailing empty line
                 continue
             (in_node, out_nodes) = line.strip().split(':')
             # First number after : denotes the amount of outoutlinks
-            self.outlink[int(in_node)] = set([int(x) for x in out_nodes.split()[1:]])
-
-        self.no_outlink = tuple([i for i in range(1, self.maxnode + 1) if i not in self.outlink])
+            outlink[int(in_node)] = set([int(x) for x in out_nodes.split()[1:]])
         print >> sys.stderr, "done."
-        return
+        return AdjacentGraph(maxnode, outlink)
 
 class PageRank:
     def __init__(self, maxnode):
@@ -92,9 +92,9 @@ def compute_pagerank(A):
 def main():
     if len(sys.argv) > 1 :
         with open(sys.argv[-1]) as f:
-            A = AdjacentGraph(f)
+            A = AdjacentGraph.fromfile(f)
     else:
-        A = AdjacentGraph(sys.stdin)
+        A = AdjacentGraph.fromfile(sys.stdin)
 
     pagerank = compute_pagerank(A)
     print pagerank
