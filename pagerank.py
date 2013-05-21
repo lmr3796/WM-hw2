@@ -20,7 +20,7 @@ class AdjacentGraph:
         return
 
     def no_out_link(self, i):
-        return i in self.link
+        return i not in self.link
 
 class PageRank:
     def __init__(self, maxnode):
