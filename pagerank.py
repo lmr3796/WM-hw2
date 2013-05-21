@@ -24,7 +24,7 @@ class AdjacentGraph:
                 continue
             (in_node, out_nodes) = line.strip().split(':')
             # First number after : denotes the amount of outoutlinks
-            self.outlink[int(in_node)] = tuple([int(x) for x in out_nodes.split()[1:]])
+            self.outlink[int(in_node)] = set([int(x) for x in out_nodes.split()[1:]])
 
         self.no_outlink = tuple([i for i in range(1, self.maxnode + 1) if i not in self.outlink])
         print >> sys.stderr, "done."
