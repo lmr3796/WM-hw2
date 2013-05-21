@@ -1,10 +1,12 @@
 #! /usr/bin/env python
 
-import sys, copy
+import sys
 import numpy
 
 EPS=1e-6
 d=0.85
+
+log_file = sys.stderr
 
 class AdjacentGraph:
     def __init__(self, f):
@@ -40,7 +42,6 @@ class PageRank:
     # Euclidean distance between their prestige
     def distance(a, b):
         d = reduce(lambda x, y: x + y**2, a.prestige - b.prestige, 0) ** 0.5
-        print >> sys.stderr, "distance =", d
         return d
 
     # Transition
@@ -67,16 +68,18 @@ class PageRank:
 # Compute pagerank from adjacency
 def compute_pagerank(A):
     print >> sys.stderr, "Computing PageRank...."
-    i = 0
-    print >> sys.stderr, "Iteration %d:" % (i),
     # Transit until converge
+    i = 0
     curr_rank = PageRank(A.maxnode)
     next_rank = A * curr_rank
-    while PageRank.distance(curr_rank, next_rank) > EPS:
+    distance = PageRank.distance(curr_rank, next_rank)
+    while distance > EPS:
         i += 1
-        print >> sys.stderr, "Iteration %d:" % (i),
+        if i % 10 == 0:
+            print >> sys.stderr, "Iteration %d: distance = %f" % (i, distance)
         curr_rank = next_rank
         next_rank = A * curr_rank
+        distance = PageRank.distance(curr_rank, next_rank)
     curr_rank = next_rank
     return curr_rank
 
