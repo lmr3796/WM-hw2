@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import sys, copy
+import numpy
 
 EPS=1e-6
 d=0.85
