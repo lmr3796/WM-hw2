@@ -19,6 +19,7 @@ class AdjacentGraph:
             # First number after : denotes the amount of outoutlinks
             self.outlink[int(in_node)] = tuple([int(x) for x in out_nodes.split()[1:]])
 
+        self.no_outlink = tuple([i for i in range(1, self.maxnode + 1) if i not in self.outlink])
         print >> sys.stderr, "done."
         return
 
@@ -47,14 +48,15 @@ class PageRank:
         assert A.maxnode == self.maxnode
         # Initiate with the 1-d for random surfing
         new_prestige = numpy.array([1-d] * (self.maxnode + 1))
-        for i in range(1, len(new_prestige)):
-            if i % 10000 == 0:
-                print >> sys.stderr, str(i)+",",
-            if i not in A.outlink:    # Share prestige to every one
-                new_prestige += d * self.prestige[i] / self.maxnode
-            else:
-                for j in A.outlink[i]: # Share prestige to outlinked ones
-                    new_prestige[j] += d * self.prestige[i] / len(A.outlink[i])
+
+        # Share prestige to outlinked ones
+        for i in A.outlink:
+            shared_prestige = d * self.prestige[i] / len(A.outlink[i])
+            for j in A.outlink[i]:
+                new_prestige[j] += shared_prestige
+
+        # Share prestige of those who have no outlinks to all node
+        new_prestige += d * sum([self.prestige[i] for i in A.no_outlink]) / self.maxnode
 
         # Return a new PageRank instance
         result = PageRank(self.maxnode)
@@ -72,6 +74,7 @@ def compute_pagerank(A):
     next_rank = A * curr_rank
     while PageRank.distance(curr_rank, next_rank) > EPS:
         i += 1
+        print >> sys.stderr, "Iteration %d:" % (i),
         curr_rank = next_rank
         next_rank = A * curr_rank
     curr_rank = next_rank
