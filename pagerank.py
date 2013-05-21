@@ -11,7 +11,9 @@ class AdjacentGraph:
         self.link = {}
         self.maxnode = int(content[0].split()[1])
         for line in content[1:]:
-            (in_node, out_nodes) = line.split(':')
+            if len(line.strip().split(':')) < 2:    # Avoid trailing empty line
+                continue
+            (in_node, out_nodes) = line.strip().split(':')
             # First number after : denotes the amount of outlinks
             self.link[int(in_node)] = tuple([int(x) for x in out_nodes.split()[1:]])
         return
