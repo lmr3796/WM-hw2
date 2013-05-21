@@ -37,7 +37,6 @@ class PageRank:
     def distance(a, b):
         return reduce(lambda x, y: x + y**2, a.prestige - b.prestige, 0) ** 0.5
 
-
     # Transition
     def __rmul__(self, A):
         assert A.maxnode == self.maxnode
@@ -55,13 +54,9 @@ class PageRank:
         result.prestige = new_prestige
         return result 
 
-def main():
-    if len(sys.argv) > 1:
-        with open(sys.argv[1]) as f:
-            A = AdjacentGraph(f)
-    else:
-        A = AdjacentGraph(sys.stdin)
 
+# Compute pagerank from adjacency
+def compute_pagerank(A):
     # Transit until converge
     curr_rank = PageRank(A.maxnode)
     next_rank = A * curr_rank
@@ -69,8 +64,18 @@ def main():
         curr_rank = next_rank
         next_rank = A * curr_rank
     curr_rank = next_rank
+    return curr_rank
 
-    print curr_rank
+
+def main():
+    if len(sys.argv) > 1:
+        with open(sys.argv[1]) as f:
+            A = AdjacentGraph(f)
+    else:
+        A = AdjacentGraph(sys.stdin)
+
+    pagerank = compute_pagerank(A)
+    print pagerank
 
     return 0
 
