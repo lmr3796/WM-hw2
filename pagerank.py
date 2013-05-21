@@ -52,8 +52,8 @@ class PageRank:
                 for j in A.link[i]: # Share prestige to linked ones
                     new_prestige[j] += d * self.prestige[i] / len(A.link[i])
 
-        # Return a new Pagerank instance
-        result = Pagerank(self.maxnode)
+        # Return a new PageRank instance
+        result = PageRank(self.maxnode)
         result.prestige = new_prestige
         return result 
 
@@ -65,9 +65,9 @@ def main():
         A = AdjacentGraph(sys.stdin)
 
     # Transit until converge
-    curr_rank = Pagerank(A.maxnode)
+    curr_rank = PageRank(A.maxnode)
     next_rank = curr_rank(A * curr_rank)
-    while Pagerank.distance(curr_rank, next_rank) > EPS:
+    while PageRank.distance(curr_rank, next_rank) > EPS:
         curr_rank = next_rank
         next_rank = curr_rank(A * curr_rank)
     curr_rank = next_rank
