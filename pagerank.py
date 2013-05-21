@@ -30,6 +30,12 @@ class PageRank:
         self.prestige = numpy.array(self.prestige)
         return
 
+    @staticmethod
+    # Euclidean distance between their prestige
+    def distance(a, b):
+        return reduce(lambda x, y: x + y**2, a.prestige - b.prestige)) ** 0.5
+
+
     # Transition
     def __mul__(self, A):
         assert A.maxnode == self.maxnode
