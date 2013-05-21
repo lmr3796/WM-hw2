@@ -35,7 +35,7 @@ class PageRank:
     @staticmethod
     # Euclidean distance between their prestige
     def distance(a, b):
-        return reduce(lambda x, y: x + y**2, a.prestige - b.prestige) ** 0.5
+        return reduce(lambda x, y: x + y**2, a.prestige - b.prestige, 0) ** 0.5
 
 
     # Transition
@@ -64,11 +64,13 @@ def main():
 
     # Transit until converge
     curr_rank = PageRank(A.maxnode)
-    next_rank = curr_rank(A * curr_rank)
+    next_rank = A * curr_rank
     while PageRank.distance(curr_rank, next_rank) > EPS:
         curr_rank = next_rank
-        next_rank = curr_rank(A * curr_rank)
+        next_rank = A * curr_rank
     curr_rank = next_rank
+
+    print curr_rank
 
     return 0
 
