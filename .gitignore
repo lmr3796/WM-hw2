@@ -1,6 +1,7 @@
 data/
 tools/eval-pagerank-0.2/eval-pagerank
 *.pagerank
+*.lexrank
 *.swp
 *.tmp
 *.log

@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import sys
+import operator
 import math
 import pagerank
 
@@ -25,6 +26,18 @@ def parse_sentence(sentence, idf):
     return v
 
 
+def build_outlink(sentence_vector_list):
+    outlink = defaultdict(set)
+    for i in range(len(sentence_vector_list)):
+        for j in range(len(sentence_vector_list)):
+            if i == j:
+                continue
+            if similarity(sentence_vector_list[i], sentence_vector_list[j]) > T:
+                outlink[i+1].add(j+1)
+                outlink[j+1].add(i+1)
+    return outlink
+
+
 def main():
     with open(sys.argv[1]) as f:
         idf = defaultdict(lambda :DEFAULT_IDF) 
@@ -38,16 +51,11 @@ def main():
         sentence_list = sys.stdin.readlines()
 
     sentence_vector_list = [parse_sentence(s, idf) for s in sentence_list]
-    outlink = defaultdict(set)
-    for i in range(len(sentence_vector_list)):
-        for j in range(len(sentence_vector_list)):
-            if i == j:
-                continue
-            if similarity(sentence_vector_list[i], sentence_vector_list[j]) > T:
-                outlink[i+1].add(j+1)
-                outlink[j+1].add(i+1)
-    for k, v in outlink.iteritems():
-        print k, v
+    outlink = build_outlink(sentence_vector_list)
+    lexAdj = pagerank.AdjacentGraph(len(sentence_vector_list), outlink)
+    lexrank = pagerank.compute_pagerank(lexAdj)
+    for k,v in sorted(enumerate(lexrank.prestige), reverse=True, key=operator.itemgetter(1)):
+        print '%d:%f' % (k, v)
     return 0
 
 if __name__ == '__main__':
