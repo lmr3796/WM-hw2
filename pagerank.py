@@ -45,7 +45,7 @@ class PageRank:
     def __rmul__(self, A):
         assert A.maxnode == self.maxnode
         # Initiate with the 1-d for random surfing
-        new_prestige = numpy([1-d] * (self.maxnode + 1))
+        new_prestige = numpy.array([1-d] * (self.maxnode + 1))
         for i in range(1, len(new_prestige)):
             if A.no_out_link(i):    # Share prestige to every one
                 new_prestige += d * self.prestige[i] / self.maxnode
