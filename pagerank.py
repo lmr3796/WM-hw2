@@ -5,8 +5,6 @@ import sys, copy
 EPS=1e-6
 d=0.85
 
-conf = {}
-
 class AdjacentGraph:
     def __init__(self, f):
         content = f.readlines()
@@ -37,7 +35,7 @@ class PageRank:
     @staticmethod
     # Euclidean distance between their prestige
     def distance(a, b):
-        return reduce(lambda x, y: x + y**2, a.prestige - b.prestige)) ** 0.5
+        return reduce(lambda x, y: x + y**2, a.prestige - b.prestige) ** 0.5
 
 
     # Transition
@@ -58,8 +56,11 @@ class PageRank:
         return result 
 
 def main():
-    with open(sys.argv[1]) as f:
-        A = AdjacentGraph(f)
+    if len(sys.argv) > 1:
+        with open(sys.argv[1]) as f:
+            A = AdjacentGraph(f)
+    else:
+        A = AdjacentGraph(sys.stdin)
 
     # Transit until converge
     curr_rank = Pagerank(A.maxnode)
