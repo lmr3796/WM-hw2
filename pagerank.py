@@ -19,7 +19,7 @@ class AdjacentGraph:
         return
 
     def no_out_link(self, i):
-        return self.link
+        return i in self.link
 
 class PageRank:
     def __init__(self, maxnode):
@@ -41,7 +41,7 @@ class PageRank:
 
 
     # Transition
-    def __mul__(self, A):
+    def __rmul__(self, A):
         assert A.maxnode == self.maxnode
         # Initiate with the 1-d for random surfing
         new_prestige = numpy([1-d] * (self.maxnode + 1))
@@ -60,7 +60,9 @@ class PageRank:
 def main():
     with open(sys.argv[1]) as f:
         A = AdjacentGraph(f)
-    p = Pagerank(A.maxnode)
+    curr_rank = Pagerank(A.maxnode)
+    next_rank = curr_rank(A)
+
 
     return 0
 
