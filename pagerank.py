@@ -9,18 +9,15 @@ d=0.85
 class AdjacentGraph:
     def __init__(self, f):
         content = f.readlines()
-        self.link = {}
+        self.outlink = {}
         self.maxnode = int(content[0].split()[1])
         for line in content[1:]:
             if len(line.strip().split(':')) < 2:    # Avoid trailing empty line
                 continue
             (in_node, out_nodes) = line.strip().split(':')
-            # First number after : denotes the amount of outlinks
-            self.link[int(in_node)] = tuple([int(x) for x in out_nodes.split()[1:]])
+            # First number after : denotes the amount of outoutlinks
+            self.outlink[int(in_node)] = tuple([int(x) for x in out_nodes.split()[1:]])
         return
-
-    def no_out_link(self, i):
-        return i not in self.link
 
 class PageRank:
     def __init__(self, maxnode):
@@ -47,11 +44,11 @@ class PageRank:
         # Initiate with the 1-d for random surfing
         new_prestige = numpy.array([1-d] * (self.maxnode + 1))
         for i in range(1, len(new_prestige)):
-            if A.no_out_link(i):    # Share prestige to every one
+            if i not in A.outlink:    # Share prestige to every one
                 new_prestige += d * self.prestige[i] / self.maxnode
             else:
-                for j in A.link[i]: # Share prestige to linked ones
-                    new_prestige[j] += d * self.prestige[i] / len(A.link[i])
+                for j in A.outlink[i]: # Share prestige to outlinked ones
+                    new_prestige[j] += d * self.prestige[i] / len(A.outlink[i])
 
         # Return a new PageRank instance
         result = PageRank(self.maxnode)
