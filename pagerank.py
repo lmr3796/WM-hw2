@@ -4,8 +4,9 @@ import sys
 import copy
 import numpy
 
-EPS=1e-6
-d=0.85
+config = {}
+config['EPS'] = 1e-6
+config['Damping'] = 0.85
 
 log_file = sys.stderr
 
@@ -53,16 +54,18 @@ class PageRank:
     def __rmul__(self, A):
         assert A.maxnode == self.maxnode
         # Initiate with the 1-d for random surfing
-        new_prestige = numpy.array([1-d] * (self.maxnode + 1))
+        default_prestige = 1 - config['Damping']
+
+        # Share prestige of those who have no outlinks to all node
+        default_prestige += config['Damping'] * sum([self.prestige[i] for i in A.no_outlink]) / self.maxnode
+        new_prestige = numpy.array([default_prestige] * (self.maxnode + 1))
 
         # Share prestige to outlinked ones
         for i in A.outlink:
-            shared_prestige = d * self.prestige[i] / len(A.outlink[i])
+            shared_prestige = config['Damping'] * self.prestige[i] / len(A.outlink[i])
             for j in A.outlink[i]:
                 new_prestige[j] += shared_prestige
 
-        # Share prestige of those who have no outlinks to all node
-        new_prestige += d * sum([self.prestige[i] for i in A.no_outlink]) / self.maxnode
 
         # Return a new PageRank instance
         result = PageRank(self.maxnode)
@@ -78,7 +81,7 @@ def compute_pagerank(A):
     curr_rank = PageRank(A.maxnode)
     next_rank = A * curr_rank
     distance = PageRank.distance(curr_rank, next_rank)
-    while distance > EPS:
+    while distance > config['EPS']:
         i += 1
         if i % 10 == 0:
             print >> sys.stderr, "Iteration %d: distance = %f" % (i, distance)
@@ -92,8 +95,10 @@ def compute_pagerank(A):
 def main():
     if len(sys.argv) > 1 :
         with open(sys.argv[-1]) as f:
+            print >> sys.stderr, 'Loading graph file %s...' % sys.argv[-1]
             A = AdjacentGraph.fromfile(f)
     else:
+        print >> sys.stderr, 'Loading graph file from stdin...'
         A = AdjacentGraph.fromfile(sys.stdin)
 
     pagerank = compute_pagerank(A)
