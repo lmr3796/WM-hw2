@@ -7,8 +7,8 @@ import pagerank
 
 from collections import defaultdict
 
-T=0.1
-DEFAULT_IDF=math.log(40252.0)
+config = {}
+config['DEFAULT_IDF'] = math.log(40252.0)
 
 
 def similarity(a, b):
@@ -32,23 +32,30 @@ def build_outlink(sentence_vector_list):
         for j in range(len(sentence_vector_list)):
             if i == j:
                 continue
-            if similarity(sentence_vector_list[i], sentence_vector_list[j]) > T:
+            if similarity(sentence_vector_list[i], sentence_vector_list[j]) > config['threshold']:
                 outlink[i+1].add(j+1)
                 outlink[j+1].add(i+1)
     return outlink
 
 
 def main():
-    with open(sys.argv[1]) as f:
-        idf = defaultdict(lambda :DEFAULT_IDF) 
+    with open(sys.argv[2]) as f:
+        print >> sys.stderr, 'Loading IDF file %s...' % sys.argv[2]
+        idf = defaultdict(lambda :config['DEFAULT_IDF']) 
         for line in f.readlines():
             (w, value) = line.strip().split()
             idf[w] = float(value)
-    if len(sys.argv) > 2 :
+
+    if len(sys.argv) > 3 :
+        print >> sys.stderr, 'Loading sentence file %s...' % sys.argv[-1]
         with open(sys.argv[-1]) as f:
             sentence_list = f.readlines()
     else:
+        print >> sys.stderr, 'Loading sentence file from stdin...'
         sentence_list = sys.stdin.readlines()
+    config['threshold'] = float(sys.argv[1])
+
+    print >> sys.stderr, 'Computing LexRank with T=%f...' % config['threshold']
 
     sentence_vector_list = [parse_sentence(s, idf) for s in sentence_list]
     outlink = build_outlink(sentence_vector_list)
